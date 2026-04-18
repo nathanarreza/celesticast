@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analyze — CelastiCast</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="star-canvas"></canvas>
+
+<div class="page-wrapper">
+
+  <!-- ── Navbar ───────────────────────────────────────── -->
+  <nav class="navbar">
+    <div class="navbar__inner">
+      <a class="navbar__logo" href="index.html">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="6"  cy="6"  r="2.5" fill="#5548e4"/>
+          <circle cx="26" cy="8"  r="2"   fill="#5548e4"/>
+          <circle cx="16" cy="16" r="3"   fill="#5548e4"/>
+          <circle cx="6"  cy="26" r="2"   fill="#5548e4"/>
+          <circle cx="27" cy="24" r="2.5" fill="#5548e4"/>
+          <line x1="6"  y1="6"  x2="16" y2="16" stroke="#5548e4" stroke-width="1" stroke-opacity="0.6"/>
+          <line x1="26" y1="8"  x2="16" y2="16" stroke="#5548e4" stroke-width="1" stroke-opacity="0.6"/>
+          <line x1="16" y1="16" x2="6"  y2="26" stroke="#5548e4" stroke-width="1" stroke-opacity="0.6"/>
+          <line x1="16" y1="16" x2="27" y2="24" stroke="#5548e4" stroke-width="1" stroke-opacity="0.6"/>
+          <line x1="6"  y1="6"  x2="26" y2="8"  stroke="#5548e4" stroke-width="0.8" stroke-opacity="0.3"/>
+          <line x1="6"  y1="26" x2="27" y2="24" stroke="#5548e4" stroke-width="0.8" stroke-opacity="0.3"/>
+        </svg>
+        Celesti<span class="accent">cast</span>
+      </a>
+
+      <div class="navbar__links">
+        <a class="navbar__link" href="index.html">Home</a>
+        <a class="navbar__link active" href="analyze.html">Analyze</a>
+        <a class="navbar__link" href="#">Pricing &amp; Plans</a>
+        <a class="navbar__link" href="#">API</a>
+        <a class="navbar__link" href="#">Shared Data</a>
+        <a class="navbar__link" href="#">Public Sets</a>
+      </div>
+
+      <div class="navbar__right">
+        <button class="btn-login">Login</button>
+        <button class="btn-menu" aria-label="Menu">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <rect y="2" width="16" height="1.5" rx="1"/>
+            <rect y="7" width="16" height="1.5" rx="1"/>
+            <rect y="12" width="16" height="1.5" rx="1"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Page title ────────────────────────────────────── -->
+  <div class="page-title">
+    <h2>Spectral Classifier</h2>
+    <p>Insert a dataset and receive spectra classifications and explorative data analytics.</p>
+  </div>
+
+  <!-- ── Main layout ───────────────────────────────────── -->
+  <main class="analyze-layout">
+
+    <!-- API endpoint config -->
+    <div class="api-config">
+      <label for="api-url">Backend URL</label>
+      <input type="text" id="api-url" placeholder="http://localhost:8080"
+             spellcheck="false" autocomplete="off">
+      <span style="font-size:11px;color:var(--text-muted);white-space:nowrap;">
+        Set to your GCP Cloud Run URL in production
+      </span>
+    </div>
+
+    <!-- Error alert -->
+    <div class="alert alert-error" id="alert"></div>
+
+    <!-- Input mode tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="upload">Upload CSV</button>
+      <button class="tab-btn" data-tab="manual">Manual Input</button>
+      <button class="tab-btn" data-tab="paste">Paste CSV</button>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────
+         TAB 1: CSV Upload
+    ───────────────────────────────────────────────────── -->
+    <div class="tab-panel active" id="tab-upload">
+      <div class="dropzone" id="dropzone">
+        <input type="file" id="file-input" accept=".csv,.txt">
+        <div class="dropzone__icon">
+          <!-- Document stack SVG matching the design reference -->
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="14" width="38" height="46" rx="3" fill="#5548e4" opacity="0.3"/>
+            <rect x="14" y="10" width="38" height="46" rx="3" fill="#5548e4" opacity="0.5"/>
+            <rect x="18" y="6"  width="38" height="46" rx="3" fill="#5548e4"/>
+            <rect x="26" y="22" width="22" height="3" rx="1" fill="white" opacity="0.9"/>
+            <rect x="26" y="30" width="16" height="3" rx="1" fill="white" opacity="0.7"/>
+            <rect x="26" y="38" width="20" height="3" rx="1" fill="white" opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="dropzone__title">Upload a Dataset</div>
+        <div class="dropzone__sub">
+          Drag &amp; drop or <strong>browse</strong> — data type must be <strong>.csv</strong>
+        </div>
+      </div>
+
+      <!-- Selected file display -->
+      <div class="file-selected" id="file-info">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <rect x="2" y="1" width="12" height="14" rx="1.5" fill="#5548e4" opacity="0.3"/>
+          <rect x="2" y="1" width="12" height="14" rx="1.5" stroke="#5548e4" stroke-width="1"/>
+          <line x1="5" y1="6"  x2="11" y2="6"  stroke="#5548e4" stroke-width="1.2"/>
+          <line x1="5" y1="9"  x2="9"  y2="9"  stroke="#5548e4" stroke-width="1.2"/>
+          <line x1="5" y1="12" x2="10" y2="12" stroke="#5548e4" stroke-width="1.2"/>
+        </svg>
+        <span id="file-name" style="flex:1;font-family:var(--font-mono);font-size:12px;"></span>
+        <span id="file-size" style="color:var(--text-muted);font-family:var(--font-mono);font-size:11px;"></span>
+        <button id="clear-file" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px;line-height:1;">&times;</button>
+      </div>
+
+      <!-- SDSS column reference -->
+      <div style="margin-top:20px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-md);padding:16px 20px;">
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.06em;">
+          Required SDSS columns
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span style="font-family:var(--font-mono);font-size:12px;padding:3px 10px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:2px;color:var(--accent);">u</span>
+          <span style="font-family:var(--font-mono);font-size:12px;padding:3px 10px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:2px;color:var(--accent);">g</span>
+          <span style="font-family:var(--font-mono);font-size:12px;padding:3px 10px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:2px;color:var(--accent);">r</span>
+          <span style="font-family:var(--font-mono);font-size:12px;padding:3px 10px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:2px;color:var(--accent);">i</span>
+          <span style="font-family:var(--font-mono);font-size:12px;padding:3px 10px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:2px;color:var(--accent);">z</span>
+          <span style="font-family:var(--font-mono);font-size:12px;padding:3px 10px;background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:2px;color:var(--accent);">redshift</span>
+          <span style="font-family:var(--font-mono);font-size:12px;padding:3px 10px;background:var(--border);border-radius:2px;color:var(--text-muted);">ra (opt)</span>
+          <span style="font-family:var(--font-mono);font-size:12px;padding:3px 10px;background:var(--border);border-radius:2px;color:var(--text-muted);">dec (opt)</span>
+          <span style="font-family:var(--font-mono);font-size:12px;padding:3px 10px;background:var(--border);border-radius:2px;color:var(--text-muted);">plate (opt)</span>
+        </div>
+        <div style="margin-top:12px;font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">
+          Compatible with SDSS DR17 CSV exports. Max 5,000 rows per request.
+        </div>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────
+         TAB 2: Manual Input
+    ───────────────────────────────────────────────────── -->
+    <div class="tab-panel" id="tab-manual">
+      <div class="manual-form">
+        <div class="manual-form__header">
+          <h3>Manual Object Entry</h3>
+          <p>Enter photometric magnitudes and redshift for each object. All six fields are required.</p>
+        </div>
+
+        <div class="manual-rows" id="manual-rows">
+          <!-- Rows injected by analyze.js -->
+        </div>
+
+        <button class="add-row-btn" id="add-row-btn">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+            <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          Add another object
+        </button>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────
+         TAB 3: Paste CSV
+    ───────────────────────────────────────────────────── -->
+    <div class="tab-panel" id="tab-paste">
+      <div class="paste-area">
+        <label for="csv-paste">Paste CSV text (include header row)</label>
+        <textarea id="csv-paste" spellcheck="false"
+          placeholder="u,g,r,i,z,redshift
+19.84,19.52,19.46,19.17,19.10,0.0
+20.10,18.90,18.20,17.85,17.60,0.083
+19.20,19.35,19.28,19.05,18.92,1.421"></textarea>
+        <div class="paste-hint" id="sample-hint">
+          Column order: u, g, r, i, z, redshift (header required)
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Submit bar ──────────────────────────────────── -->
+    <div class="submit-bar">
+      <div class="submit-bar__info">
+        Results will open in the analysis view. Classifications use
+        a Random Forest model trained on synthetic SDSS distributions.
+      </div>
+      <button class="btn btn-primary btn-lg" id="submit-btn">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 2l6 6-6 6M2 8h12" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Classify Objects
+      </button>
+    </div>
+
+  </main>
+</div><!-- .page-wrapper -->
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+  <p>Running Random Forest classifier…</p>
+</div>
+
+<script src="js/stars.js"></script>
+<script src="js/analyze.js"></script>
+</body>
+</html>

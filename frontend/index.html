@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CelastiCast — Spectral Object Classifier</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Home-specific adjustments */
+    body { overflow: hidden; }
+    @media (max-width: 900px) { body { overflow: auto; } }
+  </style>
+</head>
+<body>
+<canvas id="star-canvas"></canvas>
+
+<div class="page-wrapper">
+
+  <!-- ── Navbar ───────────────────────────────────────── -->
+  <nav class="navbar">
+    <div class="navbar__inner">
+      <a class="navbar__logo" href="index.html">
+        <!-- Network/constellation icon -->
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="6"  cy="6"  r="2.5" fill="#5548e4"/>
+          <circle cx="26" cy="8"  r="2"   fill="#5548e4"/>
+          <circle cx="16" cy="16" r="3"   fill="#5548e4"/>
+          <circle cx="6"  cy="26" r="2"   fill="#5548e4"/>
+          <circle cx="27" cy="24" r="2.5" fill="#5548e4"/>
+          <line x1="6"  y1="6"  x2="16" y2="16" stroke="#5548e4" stroke-width="1" stroke-opacity="0.6"/>
+          <line x1="26" y1="8"  x2="16" y2="16" stroke="#5548e4" stroke-width="1" stroke-opacity="0.6"/>
+          <line x1="16" y1="16" x2="6"  y2="26" stroke="#5548e4" stroke-width="1" stroke-opacity="0.6"/>
+          <line x1="16" y1="16" x2="27" y2="24" stroke="#5548e4" stroke-width="1" stroke-opacity="0.6"/>
+          <line x1="6"  y1="6"  x2="26" y2="8"  stroke="#5548e4" stroke-width="0.8" stroke-opacity="0.3"/>
+          <line x1="6"  y1="26" x2="27" y2="24" stroke="#5548e4" stroke-width="0.8" stroke-opacity="0.3"/>
+        </svg>
+        Celesti<span class="accent">cast</span>
+      </a>
+
+      <div class="navbar__links">
+        <a class="navbar__link active" href="index.html">Home</a>
+        <a class="navbar__link" href="analyze.html">Analyze</a>
+        <a class="navbar__link" href="#">Pricing &amp; Plans</a>
+        <a class="navbar__link" href="#">API</a>
+        <a class="navbar__link" href="#">Shared Data</a>
+        <a class="navbar__link" href="#">Public Sets</a>
+      </div>
+
+      <div class="navbar__right">
+        <button class="btn-login">Login</button>
+        <button class="btn-menu" aria-label="Menu">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <rect y="2" width="16" height="1.5" rx="1"/>
+            <rect y="7" width="16" height="1.5" rx="1"/>
+            <rect y="12" width="16" height="1.5" rx="1"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Hero ─────────────────────────────────────────── -->
+  <main>
+    <section class="hero">
+      <!-- Telescope / sky image placeholder -->
+      <div class="hero__image-placeholder" id="hero-img-wrap">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+          <circle cx="40" cy="40" r="38" stroke="#1e1f2e" stroke-width="2"/>
+          <!-- Simplified telescope silhouette -->
+          <rect x="30" y="44" width="20" height="18" rx="2" fill="#1e1f2e"/>
+          <ellipse cx="40" cy="44" rx="12" ry="4" fill="#2a2b3d"/>
+          <rect x="38" y="22" width="4" height="24" rx="1" fill="#2a2b3d" transform="rotate(-20, 40, 34)"/>
+          <ellipse cx="32" cy="24" rx="6" ry="2.5" fill="#2a2b3d" transform="rotate(-20, 32, 24)"/>
+          <!-- Stars around -->
+          <circle cx="15" cy="15" r="1.5" fill="#5548e4" opacity="0.8"/>
+          <circle cx="65" cy="20" r="1"   fill="#a3d4ff" opacity="0.9"/>
+          <circle cx="60" cy="55" r="1.5" fill="#5548e4" opacity="0.7"/>
+          <circle cx="18" cy="60" r="1"   fill="#a3d4ff" opacity="0.8"/>
+          <circle cx="55" cy="12" r="1"   fill="#7ec8e3" opacity="0.7"/>
+        </svg>
+        <span style="font-size:12px;font-family:var(--font-mono)">No image provided</span>
+      </div>
+
+      <div class="hero__content">
+        <h1>The all-in-one <span class="accent-link">classifier</span> for astronomy.</h1>
+        <p>
+          An accessible AI-powered tool for analyzing and processing spectral data.
+          Classify SDSS observations as Stars, Galaxies, or Quasars using
+          a trained Random Forest model.
+        </p>
+        <div class="hero__actions">
+          <a href="analyze.html" class="btn btn-primary btn-lg">Analyze Data</a>
+          <a href="#" class="btn btn-outline btn-lg">Documentation</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Features strip ─────────────────────────────── -->
+    <section class="features" style="width:100%;max-width:100%;border-left:none;border-right:none;">
+      <div class="feature-item">
+        <div class="feature-item__tag">01 / Classification</div>
+        <h3>STAR · GALAXY · QSO</h3>
+        <p>Random Forest trained on SDSS photometric and spectroscopic features. Classify thousands of objects in seconds with per-object confidence scores.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-item__tag">02 / Input Modes</div>
+        <h3>CSV, Manual, or Paste</h3>
+        <p>Upload a .csv file from SDSS DR17, enter individual object parameters by hand, or paste raw CSV text directly into the browser.</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-item__tag">03 / Analytics</div>
+        <h3>Comprehensive Reports</h3>
+        <p>Distribution charts, redshift scatter plots, confidence histograms, and a sortable results table. Export results as CSV.</p>
+      </div>
+    </section>
+  </main>
+
+</div><!-- .page-wrapper -->
+
+<script src="js/stars.js"></script>
+</body>
+</html>

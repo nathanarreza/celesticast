@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Results — CelastiCast</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="star-canvas"></canvas>
+
+<div class="page-wrapper">
+
+  <!-- ── Navbar ───────────────────────────────────────── -->
+  <nav class="navbar">
+    <div class="navbar__inner">
+      <a class="navbar__logo" href="index.html">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="6"  cy="6"  r="2.5" fill="#5548e4"/>
+          <circle cx="26" cy="8"  r="2"   fill="#5548e4"/>
+          <circle cx="16" cy="16" r="3"   fill="#5548e4"/>
+          <circle cx="6"  cy="26" r="2"   fill="#5548e4"/>
+          <circle cx="27" cy="24" r="2.5" fill="#5548e4"/>
+          <line x1="6"  y1="6"  x2="16" y2="16" stroke="#5548e4" stroke-width="1" stroke-opacity="0.6"/>
+          <line x1="26" y1="8"  x2="16" y2="16" stroke="#5548e4" stroke-width="1" stroke-opacity="0.6"/>
+          <line x1="16" y1="16" x2="6"  y2="26" stroke="#5548e4" stroke-width="1" stroke-opacity="0.6"/>
+          <line x1="16" y1="16" x2="27" y2="24" stroke="#5548e4" stroke-width="1" stroke-opacity="0.6"/>
+          <line x1="6"  y1="6"  x2="26" y2="8"  stroke="#5548e4" stroke-width="0.8" stroke-opacity="0.3"/>
+          <line x1="6"  y1="26" x2="27" y2="24" stroke="#5548e4" stroke-width="0.8" stroke-opacity="0.3"/>
+        </svg>
+        Celesti<span class="accent">cast</span>
+      </a>
+
+      <div class="navbar__links">
+        <a class="navbar__link" href="index.html">Home</a>
+        <a class="navbar__link" href="analyze.html">Analyze</a>
+        <a class="navbar__link" href="#">Pricing &amp; Plans</a>
+        <a class="navbar__link" href="#">API</a>
+        <a class="navbar__link" href="#">Shared Data</a>
+        <a class="navbar__link" href="#">Public Sets</a>
+      </div>
+
+      <div class="navbar__right">
+        <a href="analyze.html" class="btn btn-outline" style="padding:6px 16px;font-size:13px;">
+          ← New Classification
+        </a>
+        <button class="btn-login">Login</button>
+        <button class="btn-menu" aria-label="Menu">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <rect y="2" width="16" height="1.5" rx="1"/>
+            <rect y="7" width="16" height="1.5" rx="1"/>
+            <rect y="12" width="16" height="1.5" rx="1"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Page title ────────────────────────────────────── -->
+  <div class="page-title">
+    <h2>Classification Results</h2>
+    <p>Random Forest predictions with per-object confidence scores and probability distributions.</p>
+  </div>
+
+  <!-- ── Results layout ────────────────────────────────── -->
+  <main class="results-layout">
+
+    <!-- ── Summary stat cards ─────────────────────────── -->
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-card__label">Total Objects</div>
+        <div class="summary-card__value" id="sum-total">—</div>
+        <div class="summary-card__sub">classified</div>
+      </div>
+      <div class="summary-card star">
+        <div class="summary-card__label">Stars</div>
+        <div class="summary-card__value" id="sum-star">—</div>
+        <div class="summary-card__sub">stellar objects</div>
+      </div>
+      <div class="summary-card galaxy">
+        <div class="summary-card__label">Galaxies</div>
+        <div class="summary-card__value" id="sum-galaxy">—</div>
+        <div class="summary-card__sub">extended sources</div>
+      </div>
+      <div class="summary-card qso">
+        <div class="summary-card__label">Quasars (QSO)</div>
+        <div class="summary-card__value" id="sum-qso">—</div>
+        <div class="summary-card__sub">quasi-stellar objects</div>
+      </div>
+    </div>
+
+    <!-- ── Model info bar ─────────────────────────────── -->
+    <div class="model-info">
+      <div class="model-info__item">
+        <span class="model-info__key">Algorithm</span>
+        <span class="model-info__val" id="mi-algo">—</span>
+      </div>
+      <div class="model-info__item">
+        <span class="model-info__key">Estimators</span>
+        <span class="model-info__val" id="mi-trees">—</span>
+      </div>
+      <div class="model-info__item">
+        <span class="model-info__key">Model Accuracy</span>
+        <span class="model-info__val" id="mi-acc">—</span>
+      </div>
+      <div class="model-info__item">
+        <span class="model-info__key">Avg Confidence</span>
+        <span class="model-info__val" id="sum-conf">—</span>
+      </div>
+      <div class="model-info__item">
+        <span class="model-info__key">Objects Processed</span>
+        <span class="model-info__val" id="mi-objects">—</span>
+      </div>
+      <div style="margin-left:auto;">
+        <button class="btn btn-outline" id="export-btn" style="font-size:13px;padding:7px 16px;">
+          Export CSV
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Charts ─────────────────────────────────────── -->
+    <div class="charts-row">
+
+      <!-- Distribution bars -->
+      <div class="chart-box">
+        <h3>Class Distribution</h3>
+        <div class="dist-bars">
+          <div class="dist-bar star">
+            <div class="dist-bar__header">
+              <span class="dist-bar__label">STAR</span>
+              <span>
+                <span class="dist-bar__pct" id="pct-star">—</span>
+                &nbsp;·&nbsp;
+                <span id="count-star" style="font-size:12px;font-family:var(--font-mono);color:var(--text-muted);">—</span>
+              </span>
+            </div>
+            <div class="dist-bar__track">
+              <div class="dist-bar__fill" id="bar-star" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="dist-bar galaxy">
+            <div class="dist-bar__header">
+              <span class="dist-bar__label">GALAXY</span>
+              <span>
+                <span class="dist-bar__pct" id="pct-galaxy">—</span>
+                &nbsp;·&nbsp;
+                <span id="count-galaxy" style="font-size:12px;font-family:var(--font-mono);color:var(--text-muted);">—</span>
+              </span>
+            </div>
+            <div class="dist-bar__track">
+              <div class="dist-bar__fill" id="bar-galaxy" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="dist-bar qso">
+            <div class="dist-bar__header">
+              <span class="dist-bar__label">QSO</span>
+              <span>
+                <span class="dist-bar__pct" id="pct-qso">—</span>
+                &nbsp;·&nbsp;
+                <span id="count-qso" style="font-size:12px;font-family:var(--font-mono);color:var(--text-muted);">—</span>
+              </span>
+            </div>
+            <div class="dist-bar__track">
+              <div class="dist-bar__fill" id="bar-qso" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Confidence histogram -->
+      <div class="chart-box">
+        <h3>Confidence Distribution</h3>
+        <canvas id="conf-histogram" height="140" style="display:block;width:100%;"></canvas>
+        <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);margin-top:8px;">
+          x-axis: confidence score · y-axis: object count
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Second charts row -->
+    <div class="charts-row" style="margin-bottom:28px;">
+
+      <!-- Redshift scatter -->
+      <div class="chart-box">
+        <h3>Redshift vs Confidence</h3>
+        <canvas id="redshift-chart" height="140" style="display:block;width:100%;"></canvas>
+        <div style="display:flex;gap:16px;margin-top:10px;">
+          <span style="font-size:11px;font-family:var(--font-mono);color:var(--star-color);">● STAR</span>
+          <span style="font-size:11px;font-family:var(--font-mono);color:var(--galaxy-color);">● GALAXY</span>
+          <span style="font-size:11px;font-family:var(--font-mono);color:var(--qso-color);">● QSO</span>
+        </div>
+      </div>
+
+      <!-- Feature notes -->
+      <div class="chart-box">
+        <h3>Feature Reference</h3>
+        <table style="width:100%;font-size:12px;">
+          <thead>
+            <tr>
+              <th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-family:var(--font-mono);font-size:10px;font-weight:400;">Feature</th>
+              <th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-family:var(--font-mono);font-size:10px;font-weight:400;">Description</th>
+              <th style="text-align:left;padding:4px 8px;color:var(--text-muted);font-family:var(--font-mono);font-size:10px;font-weight:400;">Range (SDSS)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td style="padding:4px 8px;font-family:var(--font-mono);color:var(--accent);">u</td><td style="padding:4px 8px;color:var(--text-muted);">UV magnitude</td><td style="padding:4px 8px;color:var(--text-muted);font-family:var(--font-mono);">14–23</td></tr>
+            <tr><td style="padding:4px 8px;font-family:var(--font-mono);color:var(--accent);">g</td><td style="padding:4px 8px;color:var(--text-muted);">Green magnitude</td><td style="padding:4px 8px;color:var(--text-muted);font-family:var(--font-mono);">14–23</td></tr>
+            <tr><td style="padding:4px 8px;font-family:var(--font-mono);color:var(--accent);">r</td><td style="padding:4px 8px;color:var(--text-muted);">Red magnitude</td><td style="padding:4px 8px;color:var(--text-muted);font-family:var(--font-mono);">14–23</td></tr>
+            <tr><td style="padding:4px 8px;font-family:var(--font-mono);color:var(--accent);">i</td><td style="padding:4px 8px;color:var(--text-muted);">NIR magnitude</td><td style="padding:4px 8px;color:var(--text-muted);font-family:var(--font-mono);">14–23</td></tr>
+            <tr><td style="padding:4px 8px;font-family:var(--font-mono);color:var(--accent);">z</td><td style="padding:4px 8px;color:var(--text-muted);">IR magnitude</td><td style="padding:4px 8px;color:var(--text-muted);font-family:var(--font-mono);">14–23</td></tr>
+            <tr><td style="padding:4px 8px;font-family:var(--font-mono);color:var(--accent);">redshift</td><td style="padding:4px 8px;color:var(--text-muted);">Spectroscopic z</td><td style="padding:4px 8px;color:var(--text-muted);font-family:var(--font-mono);">0 – 5.5</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- ── Results table ───────────────────────────────── -->
+    <div class="table-section">
+      <div class="table-section__header">
+        <h3>Prediction Table</h3>
+        <div class="table-controls">
+          <span id="table-total" style="font-size:12px;color:var(--text-muted);font-family:var(--font-mono);margin-right:8px;"></span>
+          <select class="table-filter" id="class-filter">
+            <option value="ALL">All classes</option>
+            <option value="STAR">STAR</option>
+            <option value="GALAXY">GALAXY</option>
+            <option value="QSO">QSO</option>
+          </select>
+          <button class="table-export" id="export-btn-2"
+                  onclick="document.getElementById('export-btn').click()">
+            Export CSV
+          </button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-col="id">#</th>
+              <th data-col="class">Class</th>
+              <th data-col="confidence">Confidence</th>
+              <th data-col="u" style="cursor:default;">u</th>
+              <th data-col="g" style="cursor:default;">g</th>
+              <th data-col="r" style="cursor:default;">r</th>
+              <th data-col="redshift">Redshift</th>
+              <th style="cursor:default;">Probabilities</th>
+            </tr>
+          </thead>
+          <tbody id="results-tbody">
+            <tr>
+              <td colspan="8" style="text-align:center;padding:32px;color:var(--text-muted);font-family:var(--font-mono);font-size:12px;">
+                Loading results…
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-pagination">
+        <span id="page-info" style="font-size:12px;"></span>
+        <div class="pagination-btns" id="pagination-btns"></div>
+      </div>
+    </div>
+
+  </main>
+</div><!-- .page-wrapper -->
+
+<script src="js/stars.js"></script>
+<script src="js/results.js"></script>
+</body>
+</html>
